@@ -1,0 +1,26 @@
+{
+  "name": "node-lambda-calculateGravitationalForce",
+  "version": "0.0.0",
+  "description": "calculates the gravitational force between two masses",
+  "main": "index.js",
+  "scripts": {
+    "test": "make test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/the-hof/node-lambda-gravitationalForceCalculator.git"
+  },
+  "keywords": [
+    "node",
+    "lambda"
+  ],
+  "author": "John Hofmann",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/the-hof/node-lambda-gravitationalForceCalculator/issues"
+  },
+  "dependencies": {
+    "node-lambda": "0.6.2",
+    "big.js": "3.1.3"
+  }
+}
