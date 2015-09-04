@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/the-hof/node-lambda-sumVectors.git"
+    "url": "https://github.com/the-hof/lambda-gravity-model.git"
   },
   "keywords": [
     "node",
@@ -17,7 +17,7 @@
   "author": "John Hofmann",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/the-hof/node-lambda-sumVectors/issues"
+    "url": "https://github.com/the-hof/lambda-gravity-model/issues"
   },
   "dependencies": {
     "node-lambda": "0.6.2",

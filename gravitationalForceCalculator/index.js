@@ -15,7 +15,7 @@ exports.handler = function( event, context ) {
   var z = z1.minus(z2);
 
   var distance_squared = x.pow(2).plus(y.pow(2)).plus(z.pow(2));
-  var distance = distance_squared.sqrt()
+  var distance = distance_squared.sqrt();
   //console.log("distance: ", distance.toPrecision(5));
   //console.log("distance_squared: ", distance_squared.toPrecision(5));
 
@@ -34,9 +34,9 @@ exports.handler = function( event, context ) {
     x: x.div(scale_ratio).toPrecision(5),
     y: y.div(scale_ratio).toPrecision(5),
     z: z.div(scale_ratio).toPrecision(5)
-  }
+  };
 
-  console.log(gravitationalForce)
+  //console.log(gravitationalForce);
 
   context.succeed(gravitationalForce);
-}
+};
