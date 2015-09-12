@@ -6,6 +6,8 @@ var Big = require('big.js');
 // input:  An object called 'body" with "x" "y" "z" "vx" "vy" "vz" "mass" as properties
 // output:  An object called body, same type as input
 exports.handler = function( event, context ) {
+  precision =  getPrecisionFromEvent(event);
+
   var body = {
     x: new Big(event.body.x),
     y: new Big(event.body.y),
@@ -24,12 +26,16 @@ exports.handler = function( event, context ) {
   body = calculateNewPosition(force, body, event.time);
   body = calculateNewVelocity(force, body, event.time);
 
-  //console.log("body.x = " + body.x.toPrecision(5));
-  //console.log("body.y = " + body.y.toPrecision(5));
-  //console.log("body.z = " + body.z.toPrecision(5));
-  //console.log("body.vx = " + body.vx.toPrecision(5));
-  //console.log("body.vy = " + body.vy.toPrecision(5));
-  //console.log("body.vz = " + body.vz.toPrecision(5));
+  var result = {
+    x: body.x.toPrecision(precision),
+    y: body.y.toPrecision(precision),
+    z: body.z.toPrecision(precision),
+    vx: body.vx.toPrecision(precision),
+    vy: body.vy.toPrecision(precision),
+    vz: body.vz.toPrecision(precision)
+  };
+
+  console.log(result);
 
   context.succeed(body);
 };
@@ -58,7 +64,7 @@ function calculateNewVelocity(force, body, time) {
 
 //x_next = x_cur + (cur_vx * t) + ((1/2) (Fnet / mass) * t**2)
 function calculateNewPosition(force, body, time) {
-  var mass = body.mass.toPrecision(5);
+  var mass = body.mass.toPrecision(precision);
 
   var acceleration_component = {};
   acceleration_component.x = (force.x).div(mass).times(time).times(time).div(2);
@@ -80,14 +86,23 @@ function calculateNewPosition(force, body, time) {
   //console.log("velocity_component.z = " + velocity_component.z.toPrecision(5));
 
   body.x = body.x
-    .plus(acceleration_component.x.toPrecision(5))
-    .plus(velocity_component.x.toPrecision(5));
+    .plus(acceleration_component.x.toPrecision(precision))
+    .plus(velocity_component.x.toPrecision(precision));
   body.y = body.y
-    .plus(acceleration_component.y.toPrecision(5))
-    .plus(velocity_component.y.toPrecision(5));
+    .plus(acceleration_component.y.toPrecision(precision))
+    .plus(velocity_component.y.toPrecision(precision));
   body.z = body.z
-    .plus(acceleration_component.z.toPrecision(5))
-    .plus(velocity_component.z.toPrecision(5));
+    .plus(acceleration_component.z.toPrecision(precision))
+    .plus(velocity_component.z.toPrecision(precision));
 
   return body;
 }
+
+function getPrecisionFromEvent(event) {
+  if (event.precision)
+    precision = event.precision;
+  else
+    precision = 5
+
+  return precision
+};

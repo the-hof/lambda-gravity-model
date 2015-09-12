@@ -1,0 +1,27 @@
+{
+  "name": "gravitationalPhysics",
+  "version": "0.0.0",
+  "description": "advance one timestep",
+  "main": "index.js",
+  "scripts": {
+    "test": "make test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/the-hof/lambda-gravity-model"
+  },
+  "keywords": [
+    "node",
+    "lambda"
+  ],
+  "author": "John Hofmann",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/the-hof/lambda-gravity-model/issues"
+  },
+  "dependencies": {
+    "node-lambda": "0.6.2",
+    "big.js": "3.1.3",
+    "async": "1.4.2"
+  }
+}

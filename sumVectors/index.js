@@ -1,6 +1,8 @@
 var Big = require('big.js');
 
 exports.handler = function( event, context ) {
+  precision =  getPrecisionFromEvent(event);
+
   var x = new Big(0);
   var y = new Big(0);
   var z = new Big(0);
@@ -11,13 +13,22 @@ exports.handler = function( event, context ) {
     z = z.plus(event.vectors[i].z);
   }
 
-  var vectorx = {
-    x: x.toPrecision(5),
-    y: y.toPrecision(5),
-    z: z.toPrecision(5)
+  var result = {
+    x: x.toPrecision(precision),
+    y: y.toPrecision(precision),
+    z: z.toPrecision(precision)
   };
 
-  console.log(vectorx);
+  console.log(result);
 
-  context.succeed(vectorx);
+  context.succeed(result);
+};
+
+function getPrecisionFromEvent(event) {
+  if (event.precision)
+    precision = event.precision;
+  else
+    precision = 5
+
+  return precision
 };

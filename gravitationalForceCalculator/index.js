@@ -2,6 +2,8 @@ var Big = require('big.js');
 
 exports.handler = function( event, context ) {
   //console.log("Received event: ", event);
+  precision =  getPrecisionFromEvent(event);
+
   x1 = new Big(event.one.x);
   y1 = new Big(event.one.y);
   z1 = new Big(event.one.z);
@@ -29,14 +31,23 @@ exports.handler = function( event, context ) {
   //Double scale_ratio = (distance/magnitude)
   var scale_ratio = distance.div(magnitude);
 
-  var gravitationalForce = {
-    magnitude: magnitude.toPrecision(5),
-    x: x.div(scale_ratio).toPrecision(5),
-    y: y.div(scale_ratio).toPrecision(5),
-    z: z.div(scale_ratio).toPrecision(5)
+  var result = {
+    magnitude: magnitude.toPrecision(precision),
+    x: x.div(scale_ratio).toPrecision(precision),
+    y: y.div(scale_ratio).toPrecision(precision),
+    z: z.div(scale_ratio).toPrecision(precision)
   };
 
-  //console.log(gravitationalForce);
+  console.log(result);
 
-  context.succeed(gravitationalForce);
+  context.succeed(result);
+};
+
+function getPrecisionFromEvent(event) {
+  if (event.precision)
+    precision = event.precision;
+  else
+    precision = 5
+
+  return precision
 };
