@@ -35,5 +35,7 @@ node_modules
 deploy.env
 .env
 event.json
+config.json
+awsconfig.json
 .DS_Store
 .idea

@@ -1,7 +1,8 @@
 var Big = require('big.js');
 
 exports.handler = function( event, context ) {
-  precision =  getPrecisionFromEvent(event);
+  var precision =  getPrecisionFromEvent(event);
+  var average = getAverageFromEvent(event);
 
   var x = new Big(0);
   var y = new Big(0);
@@ -11,6 +12,12 @@ exports.handler = function( event, context ) {
     x = x.plus(event.vectors[i].x);
     y = y.plus(event.vectors[i].y);
     z = z.plus(event.vectors[i].z);
+  }
+
+  if (average) {
+    x = x.div(event.vectors.length);
+    y = y.div(event.vectors.length);
+    z = z.div(event.vectors.length);
   }
 
   var result = {
@@ -28,7 +35,17 @@ function getPrecisionFromEvent(event) {
   if (event.precision)
     precision = event.precision;
   else
-    precision = 5
+    precision = 5;
 
   return precision
 };
+
+function getAverageFromEvent(event) {
+  var average = false;
+
+  if (event.average && event.average == "true") {
+    average = true;
+  }
+
+  return average;
+}

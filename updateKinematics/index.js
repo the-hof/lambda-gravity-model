@@ -102,7 +102,7 @@ function getPrecisionFromEvent(event) {
   if (event.precision)
     precision = event.precision;
   else
-    precision = 5
+    precision = 5;
 
   return precision
 };
