@@ -6,68 +6,80 @@ exports.handler = function( event, context ) {
   precision =  getPrecisionFromEvent(event);
   G = event.G;
   timesize = event.timesize;
-  timestep_number = parseInt(event.number) + 1;
+  verbose = getBooleanValueFromEventValue(event.verbose);
+  var timestep_number = parseInt(event.number) + 1;
 
-  system = event.system;
-  system.sort(function (a, b) {
+  var initial_system = event.system;
+  initial_system.sort(function (a, b) {
       return (a.name).localeCompare(b.name)
     });
 
-  result = {
+  var result = {
     precision: precision,
     G: G,
     timesize: timesize,
-    timestep_number: timestep_number,
-    initial_system: system
+    timestep_number: timestep_number
   };
+
+  if (verbose)
+    result.initial_system = initial_system;
 
   AWS.config.loadFromPath('./awsconfig.json');
 
   //calculate the gravitational forces at the initial positions
-  gravitationFunction(system, function (err, initial_force_matrix) {
+  gravitationFunction(initial_system, function (err, initial_force_matrix) {
     if (err) {
       context.fail(err);
     } else {
-      result.initial_force_matrix = initial_force_matrix;
+      if (verbose)
+        result.initial_force_matrix = initial_force_matrix;
 
       //reduce initial force vectors from arrays to 1 vector per object
       sumVectorsAcrossMatrix(initial_force_matrix, function (err, initial_force_list) {
         if (err) {
           context.fail(err);
         } else {
-          result.initial_force_list = initial_force_list;
+          if (verbose)
+            result.initial_force_list = initial_force_list;
 
           //apply forces to objects and calculate updated positions and velocities
-          updateKinematics(system, initial_force_list, timesize, function (err, updated_system) {
+          updateKinematics(initial_system, initial_force_list, timesize, function (err, expected_system) {
             if (err) {
               context.fail(err)
             } else {
-              result.expected_positions = updated_system;
+              if (verbose)
+                result.expected_system = expected_system;
 
               // recalculate forces at the expected (calculated) positions
-              gravitationFunction(updated_system, function (err, recalc_force_matrix) {
+              gravitationFunction(expected_system, function (err, recalc_force_matrix) {
                 if (err) {
                   context.fail(err)
                 } else {
-                  result.recalculated_force_matrix = recalc_force_matrix;
+                  if (verbose)
+                    result.recalculated_force_matrix = recalc_force_matrix;
 
                   // reduce recalculated force vectors from arrays to 1 vector per object
                   sumVectorsAcrossMatrix(recalc_force_matrix, function(err, recalc_force_list) {
-                    result.recalculated_force_list = recalc_force_list;
+                    if (verbose)
+                      result.recalculated_force_list = recalc_force_list;
 
                     // average force vectors together
                     averageForceVectors(initial_force_list, recalc_force_list, function(err, averaged_force_list) {
                       if (err) {
                         context.fail(err)
                       } else {
-                        result.averaged_force_list = averaged_force_list;
+                        if (verbose)
+                          result.averaged_force_list = averaged_force_list;
 
                         //recalculate the "final" positions and velocities using the averaged forces
-                        updateKinematics(system, averaged_force_list, timesize, function(error, final_system) {
+                        updateKinematics(initial_system, averaged_force_list, timesize, function(error, final_system) {
                           if (err) {
                             context.fail(err)
                           } else {
-                            result.final_positions = final_system;
+                            if (verbose)
+                              result.final_system = final_system;
+                            else
+                              result.system = final_system;
                             console.log("result");
                             console.log(JSON.stringify(result, null, 2));
                             context.succeed(result);
@@ -277,6 +289,16 @@ function getPrecisionFromEvent(event) {
     precision = 5;
 
   return precision
+};
+
+function getBooleanValueFromEventValue(event_value) {
+  var value = false;
+
+  if (event_value && event_value == "true") {
+    value = true;
+  }
+
+  return value;
 };
 
 var Matrix = function (rows, columns)  {
