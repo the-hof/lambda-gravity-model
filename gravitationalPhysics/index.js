@@ -76,12 +76,10 @@ exports.handler = function( event, context ) {
                           if (err) {
                             context.fail(err)
                           } else {
-                            if (verbose)
-                              result.final_system = final_system;
-                            else
-                              result.system = final_system;
-                            console.log("result");
-                            console.log(JSON.stringify(result, null, 2));
+                            result.system = final_system;
+
+                            //console.log("result");
+                            //console.log(JSON.stringify(result, null, 2));
                             context.succeed(result);
                           }
                         });

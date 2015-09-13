@@ -34,7 +34,7 @@ node_modules
 
 deploy.env
 .env
-event.json
+event*.json
 config.json
 awsconfig.json
 .DS_Store
