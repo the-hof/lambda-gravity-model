@@ -76,8 +76,14 @@ function calculateGravitationalForce(one, two, G) {
   var thisMass = new Big(one.mass);
   var thatMass = new Big(two.mass);
   var G = new Big(G);
+
   var magnitude = G.times(thisMass).times(thatMass).div(distance_squared);
 
+  if (magnitude.eq(0)) {
+    return {
+      magnitude: 0, x: 0, y: 0, z: 0
+    }
+  }
   //Double scale_ratio = (distance/magnitude)
   var scale_ratio = distance.div(magnitude);
 
