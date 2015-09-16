@@ -18,7 +18,8 @@ exports.handler = function( event, context ) {
     precision: precision,
     G: G,
     timesize: timesize,
-    timestep_number: timestep_number
+    timestep_number: timestep_number,
+    verbose: verbose
   };
 
   if (verbose)
@@ -31,65 +32,63 @@ exports.handler = function( event, context ) {
     if (err) {
       context.fail(err);
     } else {
-      if (verbose)
+      var initial_force_list = [];
+      for (var i=0; i<initial_force_matrix.length; i++) {
+        initial_force_list.push(initial_force_matrix[i].shift())
+      }
+      if (verbose) {
         result.initial_force_matrix = initial_force_matrix;
+        result.initial_force_list = initial_force_list;
+      }
 
-      //reduce initial force vectors from arrays to 1 vector per object
-      sumVectorsAcrossMatrix(initial_force_matrix, function (err, initial_force_list) {
+      //apply forces to objects and calculate updated positions and velocities
+      updateKinematics(initial_system, initial_force_list, timesize, function (err, expected_system) {
         if (err) {
-          context.fail(err);
+          context.fail(err)
         } else {
           if (verbose)
-            result.initial_force_list = initial_force_list;
+            result.expected_system = expected_system;
 
-          //apply forces to objects and calculate updated positions and velocities
-          updateKinematics(initial_system, initial_force_list, timesize, function (err, expected_system) {
+          // recalculate forces at the expected (calculated) positions
+          gravitationFunction(expected_system, function (err, recalc_force_matrix) {
             if (err) {
               context.fail(err)
             } else {
-              if (verbose)
-                result.expected_system = expected_system;
-
-              // recalculate forces at the expected (calculated) positions
-              gravitationFunction(expected_system, function (err, recalc_force_matrix) {
+              var recalc_force_list = [];
+              var averaged_force_list = [];
+              for (var i=0; i<recalc_force_matrix.length; i++) {
+                var this_vector = recalc_force_matrix[i].shift();
+                recalc_force_list.push(this_vector);
+                averaged_force_list.push(averageTwoVectors(initial_force_list[i], this_vector));
+              }
+              if (verbose) {
+                result.recalc_force_matrix = recalc_force_matrix;
+                result.recalc_force_list = recalc_force_list;
+                result.averaged_force_list = averaged_force_list;
+              }
+              //apply forces to objects and calculate updated positions and velocities
+              updateKinematics(initial_system, averaged_force_list, timesize, function (err, final_system) {
                 if (err) {
                   context.fail(err)
                 } else {
-                  if (verbose)
-                    result.recalculated_force_matrix = recalc_force_matrix;
+                  result.system = final_system;
 
-                  // reduce recalculated force vectors from arrays to 1 vector per object
-                  sumVectorsAcrossMatrix(recalc_force_matrix, function(err, recalc_force_list) {
-                    if (verbose)
-                      result.recalculated_force_list = recalc_force_list;
 
-                    // average force vectors together
-                    averageForceVectors(initial_force_list, recalc_force_list, function(err, averaged_force_list) {
-                      if (err) {
-                        context.fail(err)
-                      } else {
-                        if (verbose)
-                          result.averaged_force_list = averaged_force_list;
-
-                        //recalculate the "final" positions and velocities using the averaged forces
-                        updateKinematics(initial_system, averaged_force_list, timesize, function(error, final_system) {
-                          if (err) {
-                            context.fail(err)
-                          } else {
-                            result.system = final_system;
-
-                            //console.log("result");
-                            //console.log(JSON.stringify(result, null, 2));
-                            context.succeed(result);
-                          }
-                        });
-                      }
-                    })
-                  })
+                  console.log("result");
+                  console.log(JSON.stringify(result, null, 2));
+                  context.succeed(result);
                 }
               });
+
+
+
+
+              //reapply
             }
           });
+
+
+
         }
       });
     }
@@ -167,110 +166,40 @@ function averageForceVectors(initial_forces, final_forces, callback) {
 }
 //</editor-fold>
 
-//<editor-fold desc="sumVectors">
-function sumVectorsAcrossMatrix(force_matrix, callback) {
+//<editor-fold desc="gravitationFunction">
+function gravitationFunction(positions, callback) {
+  var force_matrix = [];
   var tasks = [];
-  var force_list = [];
 
-  for (var i=0; i<force_matrix.length; i++) {
-    var lambda_sumVectors = new AWS.Lambda();
+  for (var i=0; i<positions.length; i++) {
+    var lambda_gravitationalForceCalculator = new AWS.Lambda();
 
     var function_params = {
       "precision": precision,
-      "vectors": force_matrix[i]
+      "G": G,
+      "index": i,
+      "body": positions
     };
 
     var params = {
-      FunctionName: "gravityModel-sumVectors-development", /* required */
+      FunctionName: "gravityModel-forceCalculator-development", /* required */
       InvocationType: "RequestResponse",
       LogType: 'None',
       Payload: JSON.stringify(function_params)
     };
 
-    var this_lambda = generateLambdaWrapper(params, lambda_sumVectors);
+    var this_lambda = generateLambdaWrapper(params, lambda_gravitationalForceCalculator);
     tasks.push(this_lambda);
   }
 
   async.parallel(tasks, function(err, results) {
-    for (var index=0; index<results.length; index++) {
-      force_list.push(JSON.parse(results[index].Payload));
-    }
-    callback(null, force_list);
-  });
-};
-//</editor-fold>
-
-//<editor-fold desc="gravitationFunction">
-function gravitationFunction(positions, callback) {
-  var force_matrix = new Matrix(positions.length, positions.length);
-  var tasks = [];
-
-  for (var i=0; i<positions.length; i++) {
-    force_matrix[i][i] = {magnitude: 0, x: 0, y: 0, z: 0};
-
-    for (var j=positions.length-1; j>i; j--) {
-
-      var lambda_gravitationalForceCalculator = new AWS.Lambda();
-
-      var function_params = {
-        "precision": precision,
-        "G": G,
-        "one": {
-          "x": positions[i].x,
-          "y": positions[i].y,
-          "z": positions[i].z,
-          "mass": positions[i].mass
-        },
-        "two": {
-          "x": positions[j].x,
-          "y": positions[j].y,
-          "z": positions[j].z,
-          "mass": positions[j].mass
-        }
-      };
-
-      var params = {
-        FunctionName: "gravityModel-calculateGravitationalForce-development", /* required */
-          InvocationType: "RequestResponse",
-        LogType: 'None',
-        Payload: JSON.stringify(function_params)
-      };
-
-      var this_lambda = generateLambdaWrapper(params, lambda_gravitationalForceCalculator);
-      tasks.push(this_lambda);
-    }
-  }
-
-  async.parallel(tasks, function(err, results) {
     if (err) callback(err);
-    var i=0;
-    var j=(positions.length)-1;
     for (var index=0; index<results.length; index++) {
-      force_matrix[i][j] = flipVector(JSON.parse(results[index].Payload));
-      force_matrix[j][i] = JSON.parse(results[index].Payload);
-      j = j-1;
-      if (j==i) {
-        i = i+1;
-        j=(positions.length)-1;
-      }
+      force_matrix.push(JSON.parse(results[index].Payload));
     }
-
     callback(null, force_matrix);
   });
-
-  //<editor-fold desc="flip vector">
-  function flipVector(vector) {
-    var result = {
-      magnitude: vector.magnitude,
-      x: vector.x * -1,
-      y: vector.y * -1,
-      z: vector.z * -1
-    };
-
-    return result
-  }
-  //</editor-fold>
-};
+}
 //</editor-fold>
 
 //<editor-fold desc="helper functions">
@@ -298,6 +227,22 @@ function getBooleanValueFromEventValue(event_value) {
 
   return value;
 };
+
+function averageTwoVectors(one, two) {
+  var x = new Big(one.x);
+  x = x.plus(two.x);
+  x = x.div(2);
+  var y = new Big(one.y).plus(two.y).div(2);
+  var z = new Big(one.z).plus(two.z).div(2);
+
+  var result = {
+    x: x.toPrecision(precision),
+    y: y.toPrecision(precision),
+    z: z.toPrecision(precision)
+  };
+
+  return result;
+}
 
 var Matrix = function (rows, columns)  {
   this.rows = rows;
