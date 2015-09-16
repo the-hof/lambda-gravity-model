@@ -73,22 +73,13 @@ exports.handler = function( event, context ) {
                 } else {
                   result.system = final_system;
 
-
                   console.log("result");
                   console.log(JSON.stringify(result, null, 2));
                   context.succeed(result);
                 }
               });
-
-
-
-
-              //reapply
             }
           });
-
-
-
         }
       });
     }
@@ -125,43 +116,6 @@ function updateKinematics(positions, force_list, timesize, callback) {
       updated_positions.push(JSON.parse(results[index].Payload));
     }
     callback(null, updated_positions);
-  });
-}
-//</editor-fold>
-
-//<editor-fold desc="averageForceVectors">
-function averageForceVectors(initial_forces, final_forces, callback) {
-  var tasks = [];
-  var force_list = [];
-
-  for (var i=0; i<initial_forces.length; i++) {
-    var lambda_sumVectors = new AWS.Lambda();
-    var vector_list = [];
-    vector_list.push(initial_forces[i]);
-    vector_list.push(final_forces[i]);
-
-    var function_params = {
-      "precision": precision,
-      "average": "true",
-      "vectors": vector_list
-    };
-
-    var params = {
-      FunctionName: "gravityModel-sumVectors-development", /* required */
-      InvocationType: "RequestResponse",
-      LogType: 'None',
-      Payload: JSON.stringify(function_params)
-    };
-
-    var this_lambda = generateLambdaWrapper(params, lambda_sumVectors);
-    tasks.push(this_lambda);
-  }
-
-  async.parallel(tasks, function(err, results) {
-    for (var index=0; index<results.length; index++) {
-      force_list.push(JSON.parse(results[index].Payload));
-    }
-    callback(null, force_list);
   });
 }
 //</editor-fold>
