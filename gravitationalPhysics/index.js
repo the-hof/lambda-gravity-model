@@ -8,6 +8,15 @@ exports.handler = function( event, context ) {
   timesize = event.timesize;
   verbose = getBooleanValueFromEventValue(event.verbose);
   var timestep_number = parseInt(event.number) + 1;
+  var max_timesteps = parseInt(event.max_timesteps);
+
+  if (isNaN(max_timesteps)) {
+    max_timesteps = 10
+  }
+
+  if (timestep_number > max_timesteps) {
+    context.fail("max number of timesteps exceeded")
+  }
 
   var initial_system = event.system;
   initial_system.sort(function (a, b) {
