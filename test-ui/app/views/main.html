@@ -1,0 +1,99 @@
+<div ng-controller="MainCtrl">
+    <div class="col-md-6">
+
+        <div class="panel panel-success">
+            <div class="panel-heading">
+                Objects
+            </div>
+            <div class="panel-body">
+                <form role="form">
+                    <div class="form-group">
+                        <label>name:</label>
+                        <input type="text" class="form-control" ng-model="body.name">
+                    </div>
+
+                    <div class="form-group">
+                        <label>x:</label>
+                        <input type="text" class="form-control" ng-model="body.x">
+                    </div>
+                    <div class="form-group">
+                        <label>y:</label>
+                        <input type="text" class="form-control" ng-model="body.y">
+                    </div>
+                    <div class="form-group">
+                        <label>z:</label>
+                        <input type="text" class="form-control" ng-model="body.z">
+                    </div>
+
+                    <div class="form-group">
+                        <label>vx:</label>
+                        <input type="text" class="form-control" ng-model="body.vx">
+                    </div>
+                    <div class="form-group">
+                        <label>vy:</label>
+                        <input type="text" class="form-control" ng-model="body.vy">
+                    </div>
+                    <div class="form-group">
+                        <label>vz:</label>
+                        <input type="text" class="form-control" ng-model="body.vz">
+                    </div>
+
+                    <div class="form-group">
+                        <a class="btn btn-success" ng-click="addBody()">
+                            Add to system
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    </div>
+    <div class="col-md-6">
+
+        <a class="btn btn-lg btn-success" ng-click="sendApi()">
+            Send to API
+            <span class="glyphicon glyphicon-ok"></span>
+        </a>
+
+        <a class="btn btn-lg btn-default" ng-href="#/about">
+            Visualize
+        </a>
+
+        <p>
+            <pre>{{event_json | json}}</pre>
+        </p>
+
+
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                System
+            </div>
+            <div class="panel-body">
+                <form role="form">
+                    <div class="form-group">
+                        <label>significant digits:</label>
+                        <input type="text" class="form-control" ng-model="event_json.precision">
+                    </div>
+                    <div class="form-group">
+                        <label>G:</label>
+                        <input type="text" class="form-control" ng-model="event_json.G">
+                    </div>
+                    <div class="form-group">
+                        <label>number of seconds per timestep:</label>
+                        <input type="text" class="form-control" ng-model="event_json.timestep">
+                    </div>
+                    <div class="checkbox">
+                        <label><input type="checkbox" ng-model="event_json.verbose">
+                            Verbose logging in results
+                        </label>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+
+

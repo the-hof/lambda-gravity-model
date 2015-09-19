@@ -39,3 +39,14 @@ config.json
 awsconfig.json
 .DS_Store
 .idea
+
+dist
+.tmp
+.sass-cache
+bower_components
+.gitattributes
+.editorconfig
+.jshintrc
+.travis.yml
+.yo-rc.json
+.bowerrc
