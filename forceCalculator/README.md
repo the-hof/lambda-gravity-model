@@ -23,7 +23,7 @@ The number of significant figures in the final answer
 G
 -----
 
-The gravitational constant
+The gravitational constant for the mass, distance, and time units used
 
 index
 -----

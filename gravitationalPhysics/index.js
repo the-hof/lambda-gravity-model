@@ -27,7 +27,7 @@ exports.handler = function( event, context ) {
     precision: precision,
     G: G,
     timesize: timesize,
-    timestep_number: timestep_number,
+    number: timestep_number,
     verbose: verbose
   };
 

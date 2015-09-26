@@ -7,7 +7,8 @@ the object's current position and velocity as well as a force vector
 Usage
 =====
 
-This function calculates the effects of a force on an object over a period of time
+This function calculates the effects of a force on an object over a period of time and
+returns the updated object state
 
 Input
 =====
@@ -105,5 +106,5 @@ Example output json
 Notes
 =====
 
-Split off into its own lambda function because it may need to get more computationally
+Split off into its own lambda function because it may get more computationally
 involved later with things like tides, collisions, and hydrostatics
