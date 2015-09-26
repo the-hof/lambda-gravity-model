@@ -35,13 +35,13 @@ body
 
 An array of objects.  Each object has numerical properties of
 
-x:  position coordinate
+    x:  position coordinate
 
-y:  position coordinate
+    y:  position coordinate
 
-z:  position coordinate
+    z:  position coordinate
 
-mass:  mass in units that align with the value of G
+    mass:  mass in units that align with the value of G
 
 Output
 ======
