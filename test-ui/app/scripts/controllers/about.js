@@ -11,5 +11,5 @@ angular.module('testUiApp')
   .controller('AboutCtrl', ['$scope', 'jsonService', function($scope, jsonService) {
     $scope.event_json = jsonService.event_json;
 
-    
+
   }]);

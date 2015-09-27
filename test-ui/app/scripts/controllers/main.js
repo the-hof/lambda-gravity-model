@@ -24,6 +24,33 @@ angular.module('testUiApp')
       $scope.body = {};
     };
 
+    $scope.addPreset = function(body_name) {
+      var body;
+
+      switch(body_name) {
+        case 'Sun': body = {
+            "name": "Sun",
+            "x": 0,
+            "y": 0,
+            "z": 0,
+            "radius": 696000000,
+            "color": 0xffff00
+          };
+          break;
+        case 'Earth': body = {
+          "name": "Earth",
+          "x": 0.471e11,
+          "y": 0,
+          "z": 0,
+          "radius": 63710000,
+          "color": 0xadd8e6
+        };
+          break;
+      }
+
+      $scope.event_json.system.push(body);
+    };
+
     function bodyIsEmpty() {
       for(var prop in $scope.body) {
         if($scope.body.hasOwnProperty(prop))

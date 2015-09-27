@@ -3,6 +3,24 @@
 
         <div class="panel panel-success">
             <div class="panel-heading">
+                Presets
+            </div>
+            <div class="panel-body">
+                <div class="form-group">
+                    <a class="btn btn-info" ng-click="addPreset('Sun')">
+                        Sun
+                    </a>
+                </div>
+                <div class="form-group">
+                    <a class="btn btn-info" ng-click="addPreset('Earth')">
+                        Earth
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel panel-success">
+            <div class="panel-heading">
                 Objects
             </div>
             <div class="panel-body">
@@ -10,6 +28,16 @@
                     <div class="form-group">
                         <label>name:</label>
                         <input type="text" class="form-control" ng-model="body.name">
+                    </div>
+
+                    <div class="form-group">
+                        <label>radius:</label>
+                        <input type="text" class="form-control" ng-model="body.radius">
+                    </div>
+
+                    <div class="form-group">
+                        <label>color:</label>
+                        <input type="text" class="form-control" ng-model="body.color">
                     </div>
 
                     <div class="form-group">
@@ -25,6 +53,7 @@
                         <input type="text" class="form-control" ng-model="body.z">
                     </div>
 
+                    <!--
                     <div class="form-group">
                         <label>vx:</label>
                         <input type="text" class="form-control" ng-model="body.vx">
@@ -37,6 +66,7 @@
                         <label>vz:</label>
                         <input type="text" class="form-control" ng-model="body.vz">
                     </div>
+                    -->
 
                     <div class="form-group">
                         <a class="btn btn-success" ng-click="addBody()">
