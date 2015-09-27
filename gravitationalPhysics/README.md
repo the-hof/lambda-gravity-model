@@ -18,6 +18,19 @@ should start with a "number" of "1" and run for as many timesteps as are allowed
 The "verbose" parameter is a boolean that, when set, tells the function to "show it's work"
 and save whatever interim calculations were used to support the updated state.
 
+Configuration
+=============
+
+Requires a configuration file called "awsconfig.json" that contains a json document of the form
+
+            {
+              "region": "us-west-2",
+              "accessKeyId": "ACCESS_KEY",
+              "secretAccessKey": "SECRET_KEY"
+            }
+
+that it will use to try to connect to the forceCalculator and updateKinematics lambda functions
+
 Input
 =====
 
